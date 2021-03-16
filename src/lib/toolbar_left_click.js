@@ -14,16 +14,12 @@ function $toolbar_left_undo_click($vm) {
         $vm.d_history_index--
     }
     // $vm.$refs.vNoteDivEdit.innerHTML = $vm.s_markdown.render($vm.d_value)
-    if ($vm.s_preview_switch) {
-        let start = $vm.getTextareaDom().selectionStart
-        let currentLength = $vm.d_value.length
-        $vm.$nextTick(() => {
-            // 光标操作
-            start -= currentLength - $vm.d_value.length
-            $vm.getTextareaDom().selectionStart = start
-            $vm.getTextareaDom().selectionEnd = start
-        })
-    }
+    $vm.$nextTick(() => {
+        // 光标操作
+        let start = $vm.textarea_selectionEnds[$vm.d_history_index];
+        $vm.getTextareaDom().selectionStart = start
+        $vm.getTextareaDom().selectionEnd = start
+    })
     $vm.getTextareaDom().focus()
 }
 // redo
@@ -31,6 +27,11 @@ function $toolbar_left_redo_click($vm) {
     if ($vm.d_history_index < $vm.d_history.length - 1) {
         $vm.d_history_index++
     }
+    $vm.$nextTick(() => {
+        let start = $vm.textarea_selectionEnds[$vm.d_history_index];
+        $vm.getTextareaDom().selectionStart = start
+        $vm.getTextareaDom().selectionEnd = start
+    })
     $vm.getTextareaDom().focus()
     // $vm.$refs.vNoteDivEdit.innerHTML = $vm.s_markdown.render($vm.d_value)
 }
@@ -53,6 +54,11 @@ function $toolbar_left_ul_click($vm) {
 function $toolbar_left_remove_line_click($vm) {
     $vm.removeLine()
 }
+
+function $toolbar_left_codeBlock_click($vm) {
+    $vm.insertCodeBlock();
+}
+
 // 直接添加链接
 export const toolbar_left_addlink = (type, text, link, $vm) => {
     let insert_text = {
@@ -149,11 +155,6 @@ export const toolbar_left_click = (_type, $vm) => {
              subfix: ')',
              str: $vm.d_words.tl_image
          },
-         'code': {
-             prefix: '```',
-             subfix: '\n\n```\n',
-             str: 'language'
-         },
          'table': {
              prefix: '',
              subfix: '',
@@ -187,7 +188,8 @@ export const toolbar_left_click = (_type, $vm) => {
          'save': $toolbar_left_save_click,
          'ol': $toolbar_left_ol_click,
          'ul': $toolbar_left_ul_click,
-         'removeLine': $toolbar_left_remove_line_click
+         'removeLine': $toolbar_left_remove_line_click,
+         'code': $toolbar_left_codeBlock_click
      };
      if (_other_left_click.hasOwnProperty(_type)) {
          _other_left_click[_type]($vm);

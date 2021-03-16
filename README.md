@@ -1,8 +1,11 @@
 # mavonEditor
 
+> 喜爱 & 想要将mavonEditor变得更好的小伙伴，邮这里 hines.zhu@gmail.com
+
+> ps: 毕业/工作已经把我榨干，能维护mavonEditor的时间越来越少（近两年的重心没有在前端，忘大家谅解:)），希望有能力的小伙伴可以来共同维护好这个小小编辑器！
+
 ![npm](https://nodei.co/npm/mavon-editor.png?downloads=true&downloadRank=true&stars=true)
 
-> 基于Vue的markdown编辑器
 
 ### [English Documents](./README-EN.md)
 [Demo for jsfiddle](https://jsfiddle.net/CHENXCHEN/qf7gLw3a/3/)
@@ -60,7 +63,7 @@ Vue.use(mavonEditor);
 ``` javascript
   plugins: [
   ...
-    { src: '@/plugins/vue-mavon-editor', srr: false }
+    { src: '@/plugins/vue-mavon-editor', ssr: false }
   ],
 ```
 > 最后一步在页面或者组件中引入
@@ -107,8 +110,8 @@ export default {
 | name 名称      | type 类型 | default 默认值 | describe 描述                          |
 | ------------ | :-----: | :---------: | ---------------------------------------- |
 | value        | String  |             | 初始值                                     |
-| language     | String  |     zh-CN      | 语言选择，暂支持 zh-CN: 中文简体 ， en: 英文 ， fr: 法语， pt-BR: 葡萄牙语， ru: 俄语， de: 德语， ja: 日语 |
-| fontSize     | String  |     15px      | 编辑区域文字大小 |
+| language     | String  |     zh-CN      | 语言选择，暂支持 zh-CN: 简体中文, zh-TW: 正体中文 ， en: 英文 ， fr: 法语， pt-BR: 葡萄牙语， ru: 俄语， de: 德语， ja: 日语 |
+| fontSize     | String  |     14px      | 编辑区域文字大小 |
 | scrollStyle  | Boolean |    true     | 开启滚动条样式(暂时仅支持chrome)              |
 | boxShadow     | Boolean  |     true     | 开启边框阴影                |
 | boxShadowStyle | String | 0 2px 12px 0 rgba(0, 0, 0, 0.1) | 边框阴影样式 |
@@ -128,6 +131,7 @@ export default {
 | imageFilter | function |     null     |  图片过滤函数，参数为一个`File Object`，要求返回一个`Boolean`, `true`表示文件合法，`false`表示文件不合法 |
 | imageClick | function |     null     |  图片点击事件，默认为预览，可覆盖 |
 | tabSize     | Number  |     \t     | tab转化为几个空格，默认为\t                      |
+| xssOptions     | Object  |     null     | xss规则配置，参考 [https://github.com/leizongmin/js-xss](https://github.com/leizongmin/js-xss)                    |
 | toolbars     | Object  |     如下例     | 工具栏                      |
 
 ```javascript
@@ -330,10 +334,12 @@ exports default {
 ## Collaborators(合作者)
 
 - [CHENXCHEN](https://github.com/CHENXCHEN)
+- [ygj6](https://github.com/ygj6)
+- [yukaige](https://github.com/yukaige)
 
 
-## Licence (证书)
+## License (证书)
 
-mavonEditor is open source and released under the MIT Licence.
+mavonEditor is open source and released under the MIT License.
 
 Copyright (c) 2017 hinesboy

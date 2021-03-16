@@ -64,7 +64,7 @@
         <!--帮助文档-->
         <transition name="fade">
             <div ref="help">
-                <div @click="toolbar_right_click('help')" class="v-note-help-wrapper" v-if="s_help">
+                <div @click.self="toolbar_right_click('help')" class="v-note-help-wrapper" v-if="s_help">
                     <div class="v-note-help-content markdown-body" :class="{'shadow': boxShadow}">
                         <i @click.stop.prevent="toolbar_right_click('help')" class="fa fa-mavon-times"
                            aria-hidden="true"></i>
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-    // import tomarkdown from './lib/core/to-markdown.js'
+// import tomarkdown from './lib/core/to-markdown.js'
 import {autoTextarea} from 'auto-textarea'
 import {keydownListen} from './lib/core/keydown-listen.js'
 import hljsCss from './lib/core/hljs/lang.hljs.css.js'
@@ -105,6 +105,7 @@ import {
     insertUl,
     insertEnter,
     removeLine,
+    insertCodeBlock,
     loadLink,
     loadScript,
     ImagePreviewListener
@@ -120,6 +121,7 @@ import md_toolbar_left from './components/md-toolbar-left.vue'
 import md_toolbar_right from './components/md-toolbar-right.vue'
 import "./lib/font/css/fontello.css"
 import './lib/css/md.css'
+const xss = require('xss');
 export default {
     mixins: [markdown],
     props: {
@@ -141,7 +143,7 @@ export default {
         },
         fontSize: { // 字体大小
             type: String,
-            default: '15px'
+            default: '14px'
         },
         toolbarsBackground: { // 工具栏背景色
             type: String,
@@ -195,6 +197,12 @@ export default {
             type: Object,
             default() {
                 return CONFIG.toolbars
+            }
+        },
+        xssOptions: { // 工具栏
+            type: Object,
+            default() {
+                return null
             }
         },
         codeStyle: { // <code></code> 样式
@@ -297,7 +305,9 @@ export default {
                     return 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css';
                 }
             },
-            p_external_link: {}
+            p_external_link: {},
+            textarea_selectionEnd: 0,
+            textarea_selectionEnds: [0]
         };
     },
     created() {
@@ -329,7 +339,7 @@ export default {
         }
         // fullscreen事件
         fullscreenchange(this);
-        this.d_value = this.value;
+        this.d_value = this.value || "";
         // 将help添加到末尾
         document.body.appendChild(this.$refs.help);
         this.loadExternalLink('markdown_css', 'css');
@@ -355,7 +365,7 @@ export default {
     methods: {
         loadExternalLink(name, type, callback) {
             if (typeof this.p_external_link[name] !== 'function') {
-                if (this.p_external_link[name] != false) {
+                if (this.p_external_link[name] !== false) {
                     console.error('external_link.' + name, 'is not a function, if you want to disabled this error log, set external_link.' + name, 'to function or false');
                 }
                 return;
@@ -447,7 +457,7 @@ export default {
                 if (isinsert === true) {
                     // 去除特殊字符
                     $file._name = $file.name.replace(/[\[\]\(\)\+\{\}&\|\\\*^%$#@\-]/g, '');
-                    
+
                     $vm.insertText($vm.getTextareaDom(),
                         {
                             prefix: '![' + $file._name + '](' + pos + ')',
@@ -565,7 +575,7 @@ export default {
         // 工具栏插入内容
         insertText(obj, {prefix, subfix, str, type}) {
             // if (this.s_preview_switch) {
-          
+
             insertTextAtCaret(obj, {prefix, subfix, str, type}, this);
         },
         insertTab() {
@@ -583,13 +593,22 @@ export default {
         unInsertTab() {
             unInsertTab(this, this.tabSize)
         },
+        insertCodeBlock() {
+            insertCodeBlock(this);
+        },
         insertEnter(event) {
             insertEnter(this, event)
         },
         saveHistory() {
             this.d_history.splice(this.d_history_index + 1, this.d_history.length)
             this.d_history.push(this.d_value)
+            this.textarea_selectionEnds.splice(this.d_history_index + 1, this.textarea_selectionEnds.length)
+            this.textarea_selectionEnds.push(this.textarea_selectionEnd)
             this.d_history_index = this.d_history.length - 1
+        },
+        saveSelectionEndsHistory() {
+            const textarea = this.$refs.vNoteTextarea && this.$refs.vNoteTextarea.$el.querySelector('textarea');
+            this.textarea_selectionEnd = textarea ? textarea.selectionEnd : this.textarea_selectionEnd;
         },
         initLanguage() {
             let lang = CONFIG.langList.indexOf(this.language) >= 0 ? this.language : 'zh-CN';
@@ -611,7 +630,7 @@ export default {
         codeStyleChange(val, isInit) {
             isInit = isInit ? isInit : false;
             if (typeof this.p_external_link.hljs_css !== 'function') {
-                if (this.p_external_link.hljs_css != false)
+                if (this.p_external_link.hljs_css !== false)
                 { console.error('external_link.hljs_css is not a function, if you want to disabled this error log, set external_link.hljs_css to function or false'); }
                 return;
             }
@@ -621,7 +640,7 @@ export default {
                 url = this.p_external_link.hljs_css('github')
             }
             if (url.length > 0) {
-                loadLink(url)
+                loadLink(url,null,"md-code-style");
             } else {
                 console.warn('hljs color scheme', val, 'do not exist, hljs color scheme will not change');
             }
@@ -656,9 +675,18 @@ export default {
     },
     watch: {
         d_value: function (val, oldVal) {
+            this.saveSelectionEndsHistory();
             this.iRender();
         },
         value: function (val, oldVal) {
+            // Escaping all XSS characters
+            //         escapeHtml (html) {
+            //             return html
+            //         }
+            if (this.xssOptions) {
+                val = xss(val, this.xssOptions);
+            }
+
             if (val !== this.d_value) {
                 this.d_value = val
             }
@@ -684,7 +712,8 @@ export default {
             if (!default_open_) {
                 default_open_ = this.subfield ? 'preview' : 'edit';
             }
-            return this.s_preview_switch = default_open_ === 'preview' ? true : false;
+            this.s_preview_switch = default_open_ === 'preview' ? true : false;
+            return this.s_preview_switch;
         },
         codeStyle: function (val) {
             this.codeStyleChange(val)

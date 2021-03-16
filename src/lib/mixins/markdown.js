@@ -11,6 +11,7 @@ var markdown_config = {
     typographer: true,
     quotes: '“”‘’'
 }
+
 var markdown = require('markdown-it')(markdown_config);
 // 表情
 var emoji = require('markdown-it-emoji');

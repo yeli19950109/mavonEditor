@@ -60,7 +60,7 @@ Vue.use(mavonEditor);
 ``` javascript
   plugins: [
   ...
-    { src: '@/plugins/vue-mavon-editor', srr: false }
+    { src: '@/plugins/vue-mavon-editor', ssr: false }
   ],
 ```
 > page
@@ -106,8 +106,8 @@ export default {
 | name    | type    |  default value | describe  |
 | -------- | :---------: | :------------: | ------- |
 | value      | String      |               | Initial value |
-| language   | String      |      zh-CN         | Language switch,  zh-CN: Simplified Chinese, en: English， fr: French, pt-BR: Brazilian Portuguese, ru: Russian, de: German, ja: Japanese |
-| fontSize     | String  |     15px      | font-size of edit area  |
+| language   | String      |      zh-CN         | Language switch,  zh-CN: Simplified Chinese, zh-TW: Traditional Chinese, en: English， fr: French, pt-BR: Brazilian Portuguese, ru: Russian, de: German, ja: Japanese |
+| fontSize     | String  |     14px      | font-size of edit area  |
 | scrollStyle| Boolean     |   true       | Open the scroll bar style(Temp only support chrome) |
 | boxShadow     | Boolean  |     true     | css: box-shadow  of mavonEditor              |
 | subfield   | Boolean     |   true        | true: Double columns - Edit preview same screen , Single Columns - otherwise not |
@@ -122,6 +122,7 @@ export default {
 | imageFilter | Function |     null     | Image file filter Function, params is a `File Object`, you should return `Boolean` about the test result |
 | imageClick | function |     null     |  Image Click Function |
 | tabSize | Number |     null     |  How many spaces equals one tab, default \t |
+| xssOptions     | Object  |     null     | xss options: [https://github.com/leizongmin/js-xss](https://github.com/leizongmin/js-xss)                    |
 | toolbars   | Object      |   As in the following example  | toolbars |
 
 ```javascript
@@ -305,9 +306,11 @@ exports default {
 ## Collaborators
 
 - [CHENXCHEN](https://github.com/CHENXCHEN)
+- [ygj6](https://github.com/ygj6)
+- [yukaige](https://github.com/yukaige)
 
-## Licence
+## License
 
-mavonEditor is open source and released under the MIT Licence.
+mavonEditor is open source and released under the MIT License.
 
 Copyright (c) 2017 hinesboy
